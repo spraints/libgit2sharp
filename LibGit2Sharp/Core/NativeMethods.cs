@@ -43,6 +43,12 @@ namespace LibGit2Sharp.Core
         }
 
         [DllImport(libgit2)]
+        public static extern int git_blob_create_fromfile(
+            out GitOid oid,
+            RepositorySafeHandle repo,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utf8Marshaler))] string path);
+
+        [DllImport(libgit2)]
         public static extern IntPtr git_blob_rawcontent(IntPtr blob);
 
         [DllImport(libgit2)]

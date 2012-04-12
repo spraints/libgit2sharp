@@ -278,6 +278,20 @@ namespace LibGit2Sharp
         }
 
         /// <summary>
+        ///   Create a new blob in the repository from an arbitrary file.
+        /// </summary>
+        /// <param name="path">Path of the file whose contents should be inserted.</param>
+        /// <returns>The id of the blob that was inserted.</returns>
+        public ObjectId HashAndInsertBlob(string path)
+        {
+            path = PosixPathHelper.ToPosix(path);
+            GitOid oid;
+            int result = NativeMethods.git_blob_create_fromfile(out oid, Handle, path);
+            Ensure.Success(result);
+            return new ObjectId(oid);
+        }
+
+        /// <summary>
         ///   Probe for a git repository.
         ///   <para>The lookup start from <paramref name = "startingPath" /> and walk upward parent directories if nothing has been found.</para>
         /// </summary>

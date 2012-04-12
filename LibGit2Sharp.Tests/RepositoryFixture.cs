@@ -216,6 +216,29 @@ namespace LibGit2Sharp.Tests
             }
         }
 
+        [TestCase("testrepo.git")]
+        [TestCase("testrepo_wd")]
+        public void CanInsertObjectFromFile(string repoPath)
+        {
+            SelfCleaningDirectory scd = BuildSelfCleaningDirectory();
+            Directory.CreateDirectory(scd.DirectoryPath);
+            var fileToInsert = Path.Combine(scd.DirectoryPath, "file_to_insert.txt");
+            File.WriteAllText(fileToInsert, "This is a test file.\n");
+            File.Exists(fileToInsert).ShouldBeTrue();
+
+            TemporaryCloneOfTestRepo tempRepoPath = BuildTemporaryCloneOfTestRepo(Path.Combine(ResourcesDirectory.FullName, repoPath));
+            using(var repo = new Repository(tempRepoPath.RepositoryPath))
+            {
+                ObjectId insertedId = repo.HashAndInsertBlob(fileToInsert);
+                insertedId.ShouldNotBeNull();
+                var insertedObject = repo.Lookup(insertedId.Sha);
+                insertedObject.ShouldNotBeNull();
+                var insertedBlob = insertedObject as Blob;
+                insertedBlob.ShouldNotBeNull();
+                insertedBlob.ContentAsUnicode().ShouldEqual("This is a test file.\n");
+            }
+        }
+
         [Test]
         public void CanLookupSameObjectTwiceAndTheyAreEqual()
         {
